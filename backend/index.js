@@ -8,9 +8,11 @@ app.use(cors());
 
 app.use(express.json());
 
-const fetchData = async () => {
+const fetchData = async (limit) => {
   try {
-    const response = await axios.get('https://fakestoreapi.com/products');
+    const response = await axios.get(
+      `https://fakestoreapi.com/products?limit=${limit}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -19,35 +21,13 @@ const fetchData = async () => {
 };
 
 app.get('/items', async (req, res) => {
-  const data = await fetchData();
-  res.json(data);
-});
+  const { index, limit } = req.query;
+  const ind = Number(index);
+  const lim = Number(limit);
+  const data = await fetchData(lim + (lim - ind));
+  const updatedData = data.slice(ind, lim + ind);
 
-app.get('/items/filter', async (req, res) => {
-  const { minRating, maxPrice } = req.query;
-  console.log(minRating, maxPrice);
-  const data = await fetchData();
-  console.log(data);
-  const filteredItems = await data.filter(
-    (item) =>
-      item.rating.rate >= Number(minRating) && item.price <= Number(maxPrice)
-  );
-  console.log(filteredItems);
-  res.json(filteredItems);
-});
-
-app.get('/items/group', async (req, res) => {
-  const data = await fetchData();
-
-  const groupedItems = data.reduce((result, item) => {
-    if (!result[item.category]) {
-      result[item.category] = [];
-    }
-    result[item.category].push(item);
-    return result;
-  }, {});
-
-  res.json(groupedItems);
+  res.json(updatedData);
 });
 
 app.listen(port, () => {

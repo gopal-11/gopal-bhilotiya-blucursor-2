@@ -4,16 +4,13 @@ import './App.css';
 function App() {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [price, setPrice] = useState(50);
-  const [ratingValue, setRatingValue] = useState(1);
-  const [isGroup, setIsGroup] = useState(false);
-  const [showCart, setShowCart] = useState(false);
+
+  const [index, setIndex] = useState(0);
+  const [limit, setlimit] = useState(50);
 
   // Fetch data from the API
   useEffect(() => {
-    fetch('https://fakestoreapi.com/products')
+    fetch(`https://fakestoreapi.com/products?limit=${limit}&index=${index}`)
       .then((response) => response.json())
       .then((data) => {
         setItems(data);
@@ -22,24 +19,13 @@ function App() {
   }, []);
 
   const handleSearch = () => {
-    setIsGroup(false);
-    fetch(
-      `http://localhost:3000/items/filter?minRating=${ratingValue}&maxPrice=${price}`
-    )
+    fetch(`http://localhost:3000/items?index=${index}&limit=${limit}`)
       .then((response) => response.json())
       .then((data) => {
         setItems(data);
         setFilteredItems(data);
       });
   };
-
-  // const getByGroupBy = () => {
-  //   fetch(`http://localhost:3000/items/group`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setGroupData(data);
-  //     });
-  // };
 
   const getStars = (rating) => {
     let stars = [];
@@ -52,55 +38,30 @@ function App() {
     return <div className="star-rating">{stars}</div>;
   };
 
-  const addToCart = (item, quantity) => {
-    const updatedCart = [...cart];
-    const existingItemIndex = updatedCart.findIndex(
-      (cartItem) => cartItem.id === item.id
-    );
-
-    if (existingItemIndex !== -1) {
-      updatedCart[existingItemIndex].quantity += quantity;
-    } else {
-      updatedCart.push({ ...item, quantity });
-    }
-
-    setCart(updatedCart);
-  };
-
-  useEffect(() => {
-    const total = cart.reduce(
-      (acc, cartItem) => acc + cartItem.price * cartItem.quantity,
-      0
-    );
-    setTotalPrice(total);
-  }, [cart]);
-
   return (
     <div className="App">
       <div className="header_main">
-        <span> Shopping Cart</span>
+        <span> Product Images assign 2</span>
         <div className="home_icon">
-          <span className="movie_detail">
-            <button onClick={() => setShowCart(!showCart)}>Cart</button>
-          </span>
+          <span></span>
         </div>
       </div>
       <div style={{ marginTop: 95 }}>
         <div>
           <label style={{ margin: '10px' }}>
-            Max Price:
+            Index:
             <input
               type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              value={index}
+              onChange={(e) => setIndex(e.target.value)}
             />
           </label>
           <label style={{ margin: '10px' }}>
-            Min Rating:
+            Count:
             <input
               type="number"
-              value={ratingValue}
-              onChange={(e) => setRatingValue(e.target.value)}
+              value={limit}
+              onChange={(e) => setlimit(e.target.value)}
             />
           </label>
 
@@ -109,20 +70,6 @@ function App() {
           </button>
         </div>
 
-        {showCart ? (
-          <div style={{ border: '1px solid black' }}>
-            <h2>Cart</h2>
-            <ul>
-              {cart.map((cartItem) => (
-                <li key={cartItem.id} style={{ listStyleType: 'none' }}>
-                  {cartItem.title} x{cartItem.quantity} -
-                  {cartItem.price * cartItem.quantity} Rs
-                </li>
-              ))}
-            </ul>
-            <p>Total Price: {totalPrice} Rs</p>
-          </div>
-        ) : null}
         <div>
           {
             <>
@@ -163,16 +110,6 @@ function App() {
                       <span>{item.title}</span>
                       <span>Price: {item.price}</span>
                       <span>Rating: {getStars(item.rating.rate)}</span>
-                      <span>
-                        {' '}
-                        <button
-                          onClick={() => {
-                            addToCart(item, 1);
-                          }}
-                        >
-                          Add to Cart
-                        </button>
-                      </span>
                     </div>
                   </div>
                 ))}

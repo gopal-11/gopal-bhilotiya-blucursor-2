@@ -24,7 +24,8 @@ app.get('/items/:startIndex/:count', async (req, res) => {
   const { startIndex, count } = req.params;
   const ind = Number(startIndex);
   const lim = Number(count);
-  const data = await fetchData(ind, lim);
+  const data = await fetchData(lim + ind);
+
   // I didn/t find api which takes index and limit as dynamic in path url
   // so modified it here the response to work as expected from the backend server
   const updatedData = data.slice(ind, lim + ind);

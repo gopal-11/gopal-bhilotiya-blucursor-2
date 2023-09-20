@@ -10,7 +10,7 @@ function App() {
 
   // Fetch data from the API
   useEffect(() => {
-    fetch(`https://fakestoreapi.com/products?limit=${limit}&index=${index}`)
+    fetch(`http://localhost:3000/items/${index}/${limit}`)
       .then((response) => response.json())
       .then((data) => {
         setItems(data);
@@ -19,7 +19,7 @@ function App() {
   }, []);
 
   const handleSearch = () => {
-    fetch(`http://localhost:3000/items?index=${index}&limit=${limit}`)
+    fetch(`http://localhost:3000/items/${index}/${limit}`)
       .then((response) => response.json())
       .then((data) => {
         setItems(data);
